@@ -91,7 +91,7 @@ app.get('/authenticate/:code', function (req, res) {
 });
 
 app.post('/email', function (req, res) {
-  console.log('sending email:' + req.body);
+  console.log('sending email:' + req);
   sendEmail(req.body, function (err, token) {
     var result = err || !token ? { "error": err } : { "token": token };
     console.log(result);
