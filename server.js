@@ -1,15 +1,15 @@
-var url   = require('url'),
-    http  = require('http'),
+var url = require('url'),
+    http = require('http'),
     https = require('https'),
-    fs    = require('fs'),
-    app   = require('express')(),
+    fs = require('fs'),
+    app = require('express')(),
     qs = require('querystring'),
     Sendgrid = require("sendgrid-web");
 
 // Load config defaults from JSON file.
 // Environment variables override defaults.
 function loadConfig() {
-  var config = JSON.parse(fs.readFileSync(__dirname+ '/config.json', 'utf-8'));
+  var config = JSON.parse(fs.readFileSync(__dirname + '/config.json', 'utf-8'));
   for (var i in config) {
     config[i] = process.env[i.toUpperCase()] || config[i];
   }
@@ -36,67 +36,67 @@ function authenticate(code, cb) {
   };
 
   var body = "";
-  var req = https.request(reqOptions, function(res) {
+  var req = https.request(reqOptions, function (res) {
     res.setEncoding('utf8');
     res.on('data', function (chunk) { body += chunk; });
-    res.on('end', function() {
+    res.on('end', function () {
       cb(null, qs.parse(body).access_token);
     });
   });
 
   req.write(data);
   req.end();
-  req.on('error', function(e) { cb(e.message); });
+  req.on('error', function (e) { cb(e.message); });
 }
 
 
-function sendEmail(email, cb) {
+function sendEmail(json, cb) {
 
-    var sendgrid = new Sendgrid({
-        user: config.sendgrid_username,
-        key: config.sendgrid_key
-    });
+  var sendgrid = new Sendgrid({
+    user: config.sendgrid_username,
+    key: config.sendgrid_key
+  });
 
-    sendgrid.send({
-        to: email,
-        from: 'augman@gmail.com',
-        subject: 'Hello world!',
-        html: '<h1>Hello world!</h1>'
-    }, function (err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Success.");
-        }
-    });
+  sendgrid.send({
+    to: json.to,
+    from: json.from,
+    subject: 'Hello world!',
+    html: '<h1>Hello world!</h1>'
+  }, function (err) {
+    if (err) {
+      cb(err);
+    } else {
+      cb(null, "Success");
+    }
+  });
 
 }
 
 // Convenience for allowing CORS on routes - GET only
 app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*'); 
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS'); 
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
 
 
-app.get('/authenticate/:code', function(req, res) {
+app.get('/authenticate/:code', function (req, res) {
   console.log('authenticating code:' + req.params.code);
-  authenticate(req.params.code, function(err, token) {
-    var result = err || !token ? {"error": "bad_code"} : { "token": token };
+  authenticate(req.params.code, function (err, token) {
+    var result = err || !token ? { "error": "bad_code" } : { "token": token };
     console.log(result);
     res.json(result);
   });
 });
 
-app.get('/email/:email', function (req, res) {
-    console.log('sending email:' + req.params.email);
-    sendEmail(req.params.code, function (err, token) {
-        var result = err || !token ? { "error": err } : { "token": token };
-        console.log(result);
-        res.json(result);
-    });
+app.post('/email', function (req, res) {
+  console.log('sending email:' + req.body);
+  sendEmail(req.body, function (err, token) {
+    var result = err || !token ? { "error": err } : { "token": token };
+    console.log(result);
+    res.json(result);
+  });
 });
 
 var port = process.env.PORT || config.port || 9999;
