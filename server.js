@@ -2,7 +2,7 @@ var url   = require('url'),
     http  = require('http'),
     https = require('https'),
     fs    = require('fs'),
-    app   = require('express').createServer(),
+    app   = require('express')(),
     qs = require('querystring'),
     Sendgrid = require("sendgrid-web");
 
@@ -58,8 +58,8 @@ function sendEmail(email, cb) {
     });
 
     sendgrid.send({
-        to: 'josh.holbrook@gmail.com',
-        from: 'josh.holbrook@gmail.com',
+        to: email,
+        from: 'augman@gmail.com',
         subject: 'Hello world!',
         html: '<h1>Hello world!</h1>'
     }, function (err) {
