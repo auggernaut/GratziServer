@@ -2,9 +2,13 @@ var url = require('url'),
     http = require('http'),
     https = require('https'),
     fs = require('fs'),
-    app = require('express')(),
+    express = require('express'),
+    app = express();
     qs = require('querystring'),
     Sendgrid = require("sendgrid-web");
+
+app.use(express.bodyParser());
+
 
 // Load config defaults from JSON file.
 // Environment variables override defaults.
@@ -60,8 +64,8 @@ function sendEmail(json, cb) {
   sendgrid.send({
     to: json.to,
     from: json.from,
-    subject: 'Hello world!',
-    html: '<h1>Hello world!</h1>'
+    subject: json.subject,
+    html: json.message
   }, function (err) {
     if (err) {
       cb(err);
@@ -91,7 +95,7 @@ app.get('/authenticate/:code', function (req, res) {
 });
 
 app.post('/email', function (req, res) {
-  console.log('sending email:' + req);
+  console.log('sending email:' + JSON.stringify(req.body));
   sendEmail(req.body, function (err, token) {
     var result = err || !token ? { "error": err } : { "token": token };
     console.log(result);
