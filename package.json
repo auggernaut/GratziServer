@@ -5,7 +5,7 @@
   "keywords"      : ["github", "oauth"],
   "author"        : "Michael Aufreiter",
   "contributors"  : [],
-  "dependencies"  : ["express", "sendgrid-web"],
+  "dependencies"  : ["express", "sendgrid-web", "crypto", "mime"],
   "engines"       : { "node": "0.6.x" },
   "lib"           : ".",
   "main"          : "index",
