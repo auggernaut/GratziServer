@@ -89,7 +89,7 @@ function createS3Creds(filename, cb){
     "expiration": "" + (_date.getFullYear()) + "-" + (_date.getMonth() + 12) + "-" + (_date.getDate()) + "T" + (_date.getHours() + 1) + ":" + (_date.getMinutes()) + ":" + (_date.getSeconds()) + "Z",
     "conditions": [
       { "bucket": "gratzi" }, 
-      [ "starts-with", "$key", "zis/"], 
+      [ "starts-with", "$key", ""],
       { "acl": "public-read" }, 
     /*  { "success_action_redirect": "http://localhost:8888/#reply" }, */
       ["starts-with", "$Content-Type", mimeType],  
@@ -105,7 +105,7 @@ function createS3Creds(filename, cb){
     s3PolicyBase64: bufPolicy ,
     s3Signature: crypto.createHmac( "sha1", config.aws_secret_access_key ).update( bufPolicy ).digest( "base64" ),
     s3Key: config.aws_access_key,
-    s3Redirect: "http://localhost:8888/#reply",
+/*    s3Redirect: "http://localhost:8888/#reply",*/
     s3Policy: s3Policy,
     s3Mime: mimeType
   }
